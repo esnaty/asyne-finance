@@ -1,0 +1,2 @@
+const http=require('node:http');const fs=require('node:fs');const path=require('node:path');
+http.createServer((req,res)=>{const name=({'/':'index.html','/style.css':'style.css','/app.js':'app.js'})[req.url?.split('?')[0]];if(!name){res.writeHead(404);return res.end('Not found');}res.setHeader('Content-Type',name.endsWith('.css')?'text/css':name.endsWith('.js')?'text/javascript':'text/html; charset=utf-8');res.end(fs.readFileSync(path.join(__dirname,'dist',name)));}).listen(4173,'127.0.0.1',()=>console.log('Local: http://127.0.0.1:4173'));
