@@ -1,0 +1,1 @@
+{"name":"@asyne/backend","version":"0.1.0","private":true,"type":"module","scripts":{"dev":"node --watch src/server.js","start":"node src/server.js","test":"node --test test/*.test.js"},"dependencies":{"express":"^5.1.0","pg":"^8.16.0","zod":"^4.1.0","decimal.js":"^10.6.0"}}

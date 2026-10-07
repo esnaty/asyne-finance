@@ -1,1 +1,20 @@
 .sites-runtime/
+node_modules/
+**/node_modules/
+frontend/dist/
+.env
+*.log
+local-data/
+
+# Private settings, credentials and local exports
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.dump
+*.backup
+*.xlsx
+*.csv
+backups/

@@ -1,0 +1,1 @@
+{"name":"asyne-finance","version":"0.1.0","private":true,"type":"module","workspaces":["frontend","backend"],"scripts":{"build":"npm run build -w frontend","test":"npm run test -w backend"},"engines":{"node":">=22.12"}}

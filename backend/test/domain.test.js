@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { calculatePosition,positionSchema,planSchema } from '../src/domain.js';
+const base={capital:60,risk:1,entry:100,stop:97,target:106,fee:.1};
+test('fees count toward risk budget',()=>{const r=calculatePosition(base);assert.equal(r.loss,.6);assert(r.investment<20);assert(r.ratio<2);});
+test('entry fee cannot push cost over cash balance',()=>{const r=calculatePosition({...base,risk:100});assert.equal(r.cost,60);});
+test('invalid stops, targets and non-finite numbers are rejected',()=>{for(const change of [{stop:100},{target:99},{capital:NaN},{fee:-1},{risk:101}])assert.throws(()=>calculatePosition({...base,...change}));});
+test('negative net profit after fees is preserved',()=>{assert(calculatePosition({...base,target:100.01}).profit<0);});
+test('missing quotes remain unknown and tiny asset quantities are supported',()=>{const p=positionSchema.parse({symbol:'btc',quantity:.00000001,averagePrice:60000,currentPrice:null,currency:'USD',strategy:'long_term'});assert.equal(p.currentPrice,null);assert.equal(p.symbol,'BTC');});
+test('plans cannot masquerade as executed trades',()=>{assert.equal(planSchema.safeParse({symbol:'BTC',market:'Binance',currency:'USDT',entry:100,stop:90,target:120,notes:'',expiresAt:null,status:'executed'}).success,false);});

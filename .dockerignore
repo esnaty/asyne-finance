@@ -1,0 +1,9 @@
+node_modules
+**/node_modules
+.git
+.env
+dist
+frontend/dist
+.openai
+.sites-runtime
+legacy-prototype

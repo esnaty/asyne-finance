@@ -1,0 +1,54 @@
+name: asyne-finance
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: asyne_finance
+      POSTGRES_USER: asyne
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-asyne_local_dev}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U asyne -d asyne_finance"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    restart: unless-stopped
+  api:
+    build: .
+    command: npm run dev -w backend
+    environment:
+      PORT: 3000
+      PGHOST: db
+      PGDATABASE: asyne_finance
+      PGUSER: asyne
+      PGPASSWORD: ${POSTGRES_PASSWORD:-asyne_local_dev}
+      TWELVE_DATA_API_KEY: ${TWELVE_DATA_API_KEY:-}
+    volumes:
+      - ./backend/src:/app/backend/src
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    restart: unless-stopped
+  web:
+    build: .
+    command: npm run dev -w frontend
+    environment:
+      API_PROXY_TARGET: http://api:3000
+    ports:
+      - "127.0.0.1:${WEB_PORT:-5174}:5173"
+    volumes:
+      - ./frontend/src:/app/frontend/src
+      - ./frontend/index.html:/app/frontend/index.html
+      - ./frontend/vite.config.js:/app/frontend/vite.config.js
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+volumes:
+  postgres_data:
